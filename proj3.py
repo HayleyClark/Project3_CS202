@@ -15,29 +15,78 @@ class Node:
 class MinHeap:
     data: list[Node] = field(default_factory=list)
 
-def heapify_up(heap: MinHeap, index: int) -> MinHeap:
 
+def heapify_up(heap: MinHeap, index: int) -> MinHeap:
+    if index == 0:
+        return heap
+    parent = (index - 1) // 2
+
+    if heap.data[index] < heap.data[parent]:
+        new_data = heap.data[:]
+        temp = new_data[index]
+        new_data[index] = new_data[parent]
+        new_data[parent] = temp
+        return heapify_up(MinHeap(new_data), parent)
+    return heap
 
 def insert(heap: MinHeap, element: Node) -> MinHeap:
+    new_data = heap.data + [element]
+    new_heap = MinHeap(new_data)
 
+    return heapify_up(new_heap, len(new_data) - 1)
 
 def heapify_down(heap: MinHeap, index: int) -> MinHeap:
+    ata = heap.data[:]
+    left = 2 * index + 1
+    right = 2 * index + 2
+    size = len(data)
 
+    if left >= size:
+        return heap
+    smallest = left
+
+    if right < size and data[right] < data[left]:
+        smallest = right
+
+    if data[smallest] < data[index]:
+        data[index], data[smallest] = data[smallest], data[index]
+        return heapify_down(MinHeap(data), smallest)
+    return heap
 
 
 def extract_min(heap: MinHeap) -> tuple[MinHeap, Node]:
+    data = heap.data
+    if len(data) == 0:
+        return MinHeap([]), None
 
+    if len(data) == 1:
+        return MinHeap([]), data[0]
+    min_node = data[0]
+    new_data = [data[-1]] + data[1:-1]
+    new_heap = MinHeap(new_data)
+    fixed_heap = heapify_down(new_heap, 0)
+
+    return fixed_heap, min_node
 
 
         
 def count_frequency(s: str)-> dict[str,int]:
-
-    pass
-
+    frequency = {}
+    for char in s:
+        if char in frequency:
+            frequency[char] += 1
+        else:
+            frequency[char] = 1
+    return frequency
+    
 
 def create_priority_queue(frequency: dict[str, int]) -> MinHeap:
+    heap = MinHeap([])
+    for char, freq in frequency.items():
+        node = Node(freq, char)
+        heap = insert(heap, node)
 
-    pass
+    return heap
 
 
 
