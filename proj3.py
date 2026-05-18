@@ -93,7 +93,7 @@ def build_tree(priority_queue: MinHeap) -> Node:
 
     heap1, left = extract_min(priority_queue)
     heap2, right = extract_min(heap1)
-    parent = Node(left.freq + right.freq, "", left, right)
+    parent = Node(left.freq + right.freq, left.char + right.char, left, right)
     new_heap = insert(heap2, parent)
 
     return build_tree(new_heap)
