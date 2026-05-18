@@ -36,7 +36,7 @@ def insert(heap: MinHeap, element: Node) -> MinHeap:
     return heapify_up(new_heap, len(new_data) - 1)
 
 def heapify_down(heap: MinHeap, index: int) -> MinHeap:
-    ata = heap.data[:]
+    data = heap.data[:]
     left = 2 * index + 1
     right = 2 * index + 2
     size = len(data)
@@ -44,10 +44,8 @@ def heapify_down(heap: MinHeap, index: int) -> MinHeap:
     if left >= size:
         return heap
     smallest = left
-
     if right < size and data[right] < data[left]:
         smallest = right
-
     if data[smallest] < data[index]:
         data[index], data[smallest] = data[smallest], data[index]
         return heapify_down(MinHeap(data), smallest)
@@ -68,7 +66,6 @@ def extract_min(heap: MinHeap) -> tuple[MinHeap, Node]:
 
     return fixed_heap, min_node
 
-
         
 def count_frequency(s: str)-> dict[str,int]:
     frequency = {}
@@ -85,35 +82,64 @@ def create_priority_queue(frequency: dict[str, int]) -> MinHeap:
     for char, freq in frequency.items():
         node = Node(freq, char)
         heap = insert(heap, node)
-
     return heap
 
 
-
 def build_tree(priority_queue: MinHeap) -> Node:
-    pass
+    if len(priority_queue.data) == 0:
+        return None
+    if len(priority_queue.data) == 1:
+        return priority_queue.data[0]
 
+    heap1, left = extract_min(priority_queue)
+    heap2, right = extract_min(heap1)
+    parent = Node(left.freq + right.freq, "", left, right)
+    new_heap = insert(heap2, parent)
 
+    return build_tree(new_heap)
 
 
 def generate_codes(node: Node | None, prefix="", code: dict | None =None)-> dict:
     if code is None:
-        code = {}  
-    pass
+        code = {}
+    if node is None:
+        return code
+
+    if node.left is None and node.right is None:
+        code = {**code, node.char: prefix or "0"}
+    code = generate_codes(node.left, prefix + "0", code)
+    code = generate_codes(node.right, prefix + "1", code)
+    return code
 
 
 def encode(s: str, codes: dict)-> str:
-    pass
+    encoded = ""
+    for char in s:
+        encoded += codes[char]
+    return encoded
 
 
 def decode(encoded_string: str, root: Node):
-    pass
+    if root.left is None and root.right is None:
+        return root.char * len(encoded_string)
+    decoded = ""
+    current = root
+    for bit in encoded_string:
+        if bit == "0":
+            current = current.left
+        else:
+            current = current.right
+
+        if current.left is None and current.right is None:
+            decoded += current.char
+            current = root
+    return decoded
 
 def huffman_encoding(s:str):
     #Do Not Change this function
     frequency = count_frequency(s)
     pq = create_priority_queue(frequency)
-    root = build_tree_from_queue(pq)
+    root = build_tree(pq)
     codes = generate_codes(root)
     encoded_string = encode(s, codes)
     decoded_string = decode(encoded_string,root)
